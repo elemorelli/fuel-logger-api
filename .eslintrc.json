@@ -1,0 +1,46 @@
+{
+    "env": {
+        "commonjs": true,
+        "es6": true,
+        "node": true,
+        "browser": true
+    },
+    "extends": "eslint:recommended",
+    "globals": {
+        "Atomics": "readonly",
+        "SharedArrayBuffer": "readonly"
+    },
+    "parserOptions": {
+        "ecmaVersion": 2018
+    },
+    "rules": {
+        "semi": [
+            2,
+            "always"
+        ],
+        "quotes": [
+            2,
+            "double",
+            {
+                "allowTemplateLiterals": true
+            }
+        ],
+        "no-unused-vars": [
+            "error",
+            {
+                "argsIgnorePattern": "^_"
+            }
+        ],
+        "require-atomic-updates": "off"
+    },
+    "overrides": [
+        {
+            "files": [
+                "*.test.js"
+            ],
+            "rules": {
+                "no-undef": "off"
+            }
+        }
+    ]
+}
