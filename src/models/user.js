@@ -21,7 +21,7 @@ const schema = new mongoose.Schema({
             }
         }
     },
-    emaill: {
+    email: {
         type: String,
         required: true,
         unique: true,
@@ -68,9 +68,8 @@ schema.methods.generateAuthToken = async function () {
     const user = this;
     const token = jwt.sign(
         { _id: user._id.toString() },
-        process.env.JWT_TOKEN,
-        { expiresIn: "14 days" }
-    );
+        process.env.JWT_SECRET,
+        { expiresIn: "1 day" });
     user.tokens = user.tokens.concat({ token });
     await user.save();
     return token;
