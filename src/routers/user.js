@@ -56,7 +56,7 @@ router.patch("/users/me", auth, async (req, res) => {
     const isValidOperation = updates.every((update) => allowedFields.includes(update));
 
     if (!isValidOperation) {
-        return res.status(400).send({ error: "Invalid fields to update" });
+        return res.status(400).send({ error: "Invalid fields" });
     }
     try {
         updates.forEach((field) => req.user[field] = req.body[field]);
