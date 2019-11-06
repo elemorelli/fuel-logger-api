@@ -18,12 +18,9 @@ test("Should signup a new user", async () => {
         .send(newUser)
         .expect(201);
 
-    // Assert that the DB was changed correctly
     const user = await User.findById(response.body.user._id);
     expect(user).not.toBeNull();
 
-
-    // Assertions about the response
     expect(response.body).toMatchObject({
         user: {
             name: newUser.name,
@@ -32,8 +29,39 @@ test("Should signup a new user", async () => {
         token: user.tokens[0].token
     });
 
-    // Assert that the user is not saved as plan text
     expect(user.password).not.toBe(newUser.password);
+});
+
+test("Should not signup user with invalid email", async () => {
+    const newUser = {
+        name: "invalid mail user",
+        email: "invalidmail.com",
+        password: "SomePass112233!"
+    };
+
+    await request(app)
+        .post("/users")
+        .send(newUser)
+        .expect(400);
+
+    const user = await User.findOne({ email: "invalidmail.com" });
+    expect(user).toBeNull();
+});
+
+test("Should not signup user with weak password", async () => {
+    const newUser = {
+        name: "weak password user",
+        email: "weak@user.com",
+        password: "password123"
+    };
+
+    await request(app)
+        .post("/users")
+        .send(newUser)
+        .expect(400);
+
+    const user = await User.findOne({ email: "weak@user.com" });
+    expect(user).toBeNull();
 });
 
 test("Should login existing user", async () => {
@@ -121,7 +149,7 @@ test("Should not update invalid user fields", async () => {
         .patch("/users/me")
         .set("Authorization", `Bearer ${token}`)
         .send({
-            location: "new location"
+            invalid_field: "invalid field"
         })
         .expect(400);
 
@@ -129,8 +157,43 @@ test("Should not update invalid user fields", async () => {
     expect(user.location).toBeUndefined();
 });
 
-// TODO: Extra tests
-// Should not signup user with invalid name/email/password
-// Should not update user if unauthenticated
-// Should not update user with invalid name/email/password
-// Should not delete user if unauthenticated
+test("Should not update unauthenticated user", async () => {
+    await request(app)
+        .patch("/users/me")
+        .send({
+            name: "new name"
+        })
+        .expect(401);
+
+    const user = await User.findById(userOneId);
+    expect(user.name).not.toBe("new name");
+});
+
+test("Should not update user with invalid email", async () => {
+    await request(app)
+        .patch("/users/me")
+        .set("Authorization", `Bearer ${token}`)
+        .send({
+            name: "invalid email user",
+            email: "newinvalidmail.com"
+        })
+        .expect(400);
+
+    const user = await User.findById(userOneId);
+    expect(user.name).not.toBe("invalid email user");
+    expect(user.email).not.toBe("newinvalidmail.com");
+});
+
+test("Should not update user with weak password", async () => {
+    await request(app)
+        .patch("/users/me")
+        .set("Authorization", `Bearer ${token}`)
+        .send({
+            name: "weak password user",
+            password: "password123"
+        })
+        .expect(400);
+
+    const user = await User.findById(userOneId);
+    expect(user.password).not.toBe("weak password user");
+});

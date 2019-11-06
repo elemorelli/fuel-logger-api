@@ -15,7 +15,7 @@ const schema = new mongoose.Schema({
         trim: true,
         minlength: 7,
         validate(value) {
-            // TODO: Password strength check
+            // TODO: Password strength check: owasp-password-strength-test
             if (value.toLowerCase().includes("password")) {
                 throw new Error("Password is too weak");
             }
