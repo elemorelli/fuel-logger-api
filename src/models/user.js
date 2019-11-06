@@ -3,6 +3,7 @@ const validator = require("validator");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const passwordValidator = require("../utils/password-validator");
+const Vehicle = require("./vehicle");
 
 const schema = new mongoose.Schema({
     name: {
@@ -44,12 +45,11 @@ const schema = new mongoose.Schema({
     timestamps: true
 });
 
-// TODO: References to things owned by the user
-// schema.virtual("referenceAttribute", {
-//     ref: "OtherModel",
-//     localField: "_id",
-//     foreignField: "owner"
-// });
+schema.virtual("vehicles", {
+    ref: "Vehicle",
+    localField: "_id",
+    foreignField: "owner"
+});
 
 schema.statics.findByCredentials = async (email, password) => {
 
@@ -94,11 +94,10 @@ schema.pre("save", async function (next) {
 });
 
 schema.pre("remove", async function (next) {
-    //const user = this;
-    // TODO: Remove all documents owned by this user
-    //await otherModel.deleteMany({
-    //    owner: user._id
-    //});
+    const user = this;
+    await Vehicle.deleteMany({
+        owner: user._id
+    });
     next();
 });
 
