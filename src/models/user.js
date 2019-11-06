@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const validator = require("validator");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const passwordValidator = require("../utils/password-validator");
 
 const schema = new mongoose.Schema({
     name: {
@@ -15,9 +16,9 @@ const schema = new mongoose.Schema({
         trim: true,
         minlength: 7,
         validate(value) {
-            // TODO: Password strength check: owasp-password-strength-test
-            if (value.toLowerCase().includes("password")) {
-                throw new Error("Password is too weak");
+            const result = passwordValidator.test(value);
+            if (!result.strong) {
+                throw new Error(result.errors);
             }
         }
     },
@@ -29,7 +30,7 @@ const schema = new mongoose.Schema({
         lowercase: true,
         validate(value) {
             if (!validator.isEmail(value)) {
-                throw new Error("Invalid Email");
+                throw new Error("Invalid email");
             }
         }
     },
