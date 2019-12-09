@@ -127,6 +127,17 @@ test("Should not delete account for unauthenticated user", async () => {
         .expect(401);
 });
 
+test("Should upload avatar", async () => {
+    await request(app)
+        .post("/users/me/avatar")
+        .set("Authorization", `Bearer ${token}`)
+        .attach("avatar", "tests/fixtures/profile-pic.jpg")
+        .expect(200);
+
+    const user = await User.findById(userOneId);
+    expect(user.avatar).toEqual(expect.any(Buffer));
+});
+
 test("Should update valid user fields", async () => {
     await request(app)
         .patch("/users/me")
