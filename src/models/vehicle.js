@@ -10,6 +10,9 @@ const schema = new mongoose.Schema({
         type: String,
         trim: true
     },
+    picture: {
+        type: Buffer
+    },
     owner: {
         type: mongoose.Schema.Types.ObjectId,
         required: true,
@@ -18,6 +21,13 @@ const schema = new mongoose.Schema({
 }, {
     timestamps: true
 });
+
+schema.methods.toJSON = function () {
+    const vehicle = this;
+    const vehicleProfile = vehicle.toObject();
+    delete vehicleProfile.picture;
+    return vehicleProfile;
+};
 
 const Vehicle = mongoose.model("Vehicle", schema);
 

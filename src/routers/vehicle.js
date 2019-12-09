@@ -1,6 +1,8 @@
 const express = require("express");
+const sharp = require("sharp");
 const Vehicle = require("../models/vehicle");
 const auth = require("../middleware/auth");
+const upload = require("../middleware/upload");
 
 const router = new express.Router();
 
@@ -41,17 +43,21 @@ router.get("/vehicles", auth, async (req, res) => {
     }
 });
 
+async function getVehicleById(req, res) {
+    const vehicle = await Vehicle.findOne({
+        _id: req.params.id,
+        owner: req.user._id
+    });
+    if (!vehicle) {
+        res.status(404).send();
+    }
+    return vehicle;
+}
+
 router.get("/vehicles/:id", auth, async (req, res) => {
 
     try {
-        const vehicle = await Vehicle.findOne({
-            _id: req.params._id,
-            owner: req.user._id
-        });
-
-        if (!vehicle) {
-            res.status(404).send();
-        }
+        const vehicle = await getVehicleById(req, res);
         res.send(vehicle);
     } catch (error) {
         res.status(500);
@@ -98,5 +104,44 @@ router.delete("/vehicles/:id", auth, async (req, res) => {
     }
 });
 
+router.post("/vehicles/:id/picture", auth, upload.single("picture"), async (req, res) => {
+    try {
+        const vehicle = await getVehicleById(req, res);
+
+        const buffer = await sharp(req.file.buffer).resize({
+            width: 250,
+            height: 250
+        }).png().toBuffer();
+
+        vehicle.picture = buffer;
+        await vehicle.save();
+        res.send();
+    } catch (error) {
+        res.status(500).send(error);
+    }
+});
+
+router.get("/vehicles/:id/picture", auth, async (req, res) => {
+    try {
+        const vehicle = await getVehicleById(req, res);
+
+        if (!vehicle || !vehicle.picture) {
+            res.status(404).send();
+        } else {
+            res.set("Content-Type", "image/png");
+            res.send(vehicle.picture);
+        }
+    } catch (error) {
+        res.status(400).send();
+    }
+});
+
+router.delete("/vehicles/:id/picture", auth, async (req, res) => {
+
+    const vehicle = await getVehicleById(req, res);
+    vehicle.picture = undefined;
+    await vehicle.save();
+    res.send();
+});
 
 module.exports = router;
