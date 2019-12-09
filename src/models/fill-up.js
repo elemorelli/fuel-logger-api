@@ -34,6 +34,6 @@ const schema = new mongoose.Schema({
     timestamps: true
 });
 
-const FuelLoad = mongoose.model("FuelLoad", schema);
+const FillUp = mongoose.model("FillUp", schema);
 
-module.exports = FuelLoad;
+module.exports = FillUp;

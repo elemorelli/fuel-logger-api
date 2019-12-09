@@ -45,7 +45,7 @@ router.get("/vehicles", auth, async (req, res) => {
 
 async function getVehicleById(req, res) {
     const vehicle = await Vehicle.findOne({
-        _id: req.params.id,
+        _id: req.params.vehicle_id,
         owner: req.user._id
     });
     if (!vehicle) {
@@ -54,17 +54,17 @@ async function getVehicleById(req, res) {
     return vehicle;
 }
 
-router.get("/vehicles/:id", auth, async (req, res) => {
+router.get("/vehicles/:vehicle_id", auth, async (req, res) => {
 
     try {
         const vehicle = await getVehicleById(req, res);
         res.send(vehicle);
     } catch (error) {
-        res.status(500);
+        res.status(500).send();
     }
 });
 
-router.patch("/vehicles/:id", auth, async (req, res) => {
+router.patch("/vehicles/:vehicle_id", auth, async (req, res) => {
     const updates = Object.keys(req.body);
     const allowedFields = ["model"];
     const isValidOperation = updates.every((update) => allowedFields.includes(update));
@@ -74,13 +74,7 @@ router.patch("/vehicles/:id", auth, async (req, res) => {
     }
 
     try {
-        const vehicle = await Vehicle.findOne({
-            _id: req.params.id,
-            owner: req.user._id
-        });
-        if (!vehicle) {
-            return res.status(404).send();
-        }
+        const vehicle = await getVehicleById(req, res);
         allowedFields.forEach((field) => vehicle[field] = req.body[field]);
         await vehicle.save();
         res.send(vehicle);
@@ -89,10 +83,10 @@ router.patch("/vehicles/:id", auth, async (req, res) => {
     }
 });
 
-router.delete("/vehicles/:id", auth, async (req, res) => {
+router.delete("/vehicles/:vehicle_id", auth, async (req, res) => {
     try {
         const vehicle = await Vehicle.findOneAndDelete({
-            _id: req.params.id,
+            _id: req.params.vehicle_id,
             owner: req.user._id
         });
         if (!vehicle) {
@@ -104,7 +98,7 @@ router.delete("/vehicles/:id", auth, async (req, res) => {
     }
 });
 
-router.post("/vehicles/:id/picture", auth, upload.single("picture"), async (req, res) => {
+router.post("/vehicles/:vehicle_id/picture", auth, upload.single("picture"), async (req, res) => {
     try {
         const vehicle = await getVehicleById(req, res);
 
@@ -121,11 +115,11 @@ router.post("/vehicles/:id/picture", auth, upload.single("picture"), async (req,
     }
 });
 
-router.get("/vehicles/:id/picture", auth, async (req, res) => {
+router.get("/vehicles/:vehicle_id/picture", auth, async (req, res) => {
     try {
         const vehicle = await getVehicleById(req, res);
 
-        if (!vehicle || !vehicle.picture) {
+        if (!vehicle.picture) {
             res.status(404).send();
         } else {
             res.set("Content-Type", "image/png");
@@ -136,7 +130,7 @@ router.get("/vehicles/:id/picture", auth, async (req, res) => {
     }
 });
 
-router.delete("/vehicles/:id/picture", auth, async (req, res) => {
+router.delete("/vehicles/:vehicle_id/picture", auth, async (req, res) => {
 
     const vehicle = await getVehicleById(req, res);
     vehicle.picture = undefined;

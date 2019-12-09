@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const FillUp = require("./fill-up");
 
 const schema = new mongoose.Schema({
     model: {
@@ -22,12 +23,26 @@ const schema = new mongoose.Schema({
     timestamps: true
 });
 
+schema.virtual("fillUps", {
+    ref: "FillUp",
+    localField: "_id",
+    foreignField: "owner"
+});
+
 schema.methods.toJSON = function () {
     const vehicle = this;
     const vehicleProfile = vehicle.toObject();
     delete vehicleProfile.picture;
     return vehicleProfile;
 };
+
+schema.pre("remove", async function (next) {
+    const user = this;
+    await FillUp.deleteMany({
+        owner: user._id
+    });
+    next();
+});
 
 const Vehicle = mongoose.model("Vehicle", schema);
 
