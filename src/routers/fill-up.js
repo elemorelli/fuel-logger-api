@@ -34,13 +34,16 @@ router.post("/vehicles/:vehicle_id/fillups", auth, async (req, res) => {
 
 router.get("/vehicles/:vehicle_id/fillups", auth, async (req, res) => {
     try {
-        const vehicle = await getVehicleById(req, res);
-        res.send(vehicle.fillUps);
+        // TODO: Replace with easier way to validate user -> vehicule
+        await getVehicleById(req, res);
+        const fillUps = await FillUp.find({
+            owner: req.params.vehicle_id
+        });
+        res.send(fillUps);
     } catch (error) {
         res.status(400).send();
     }
 });
-
 
 router.get("/vehicles/:vehicle_id/fillups/:fillup_id", auth, async (req, res) => {
     try {
@@ -53,11 +56,11 @@ router.get("/vehicles/:vehicle_id/fillups/:fillup_id", auth, async (req, res) =>
         });
         res.send(fillUp);
     } catch (error) {
-        res.status(500);
+        res.status(400).send();
     }
 });
 
-router.delete("/vehicles/:vehicle_id/fillups/:fillup_id", auth, async (req, res) => {
+router.patch("/vehicles/:vehicle_id/fillups/:fillup_id", auth, async (req, res) => {
     try {
         const updates = Object.keys(req.body);
         const allowedFields = ["odometer", "fuel", "price"];
