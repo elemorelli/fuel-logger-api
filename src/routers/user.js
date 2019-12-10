@@ -78,7 +78,6 @@ router.delete("/users/me", auth, async (req, res) => {
     }
 });
 
-
 router.post("/users/me/avatar", auth, upload.single("avatar"), async (req, res) => {
     try {
         const buffer = await sharp(req.file.buffer).resize({
@@ -90,20 +89,16 @@ router.post("/users/me/avatar", auth, upload.single("avatar"), async (req, res) 
         await req.user.save();
         res.send();
     } catch (error) {
-        res.status(500).send(error);
+        res.status(400).send(error);
     }
 });
 
 router.get("/users/me/avatar", auth, async (req, res) => {
-    try {
-        if (!req.user || !req.user.avatar) {
-            res.status(404).send();
-        } else {
-            res.set("Content-Type", "image/png");
-            res.send(req.user.avatar);
-        }
-    } catch (error) {
-        res.status(400).send();
+    if (!req.user || !req.user.avatar) {
+        res.status(404).send();
+    } else {
+        res.set("Content-Type", "image/png");
+        res.send(req.user.avatar);
     }
 });
 
@@ -119,7 +114,7 @@ router.get("/users/:id/avatar", async (req, res) => {
             res.send(user.avatar);
         }
     } catch (error) {
-        res.status(400).send();
+        res.status(404).send();
     }
 });
 
