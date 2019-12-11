@@ -21,7 +21,7 @@ router.post("/vehicles/:vehicle_id/fillups", auth, async (req, res) => {
         });
 
         await fillUp.save();
-        res.send();
+        res.status(201).send(fillUp);
     } catch (error) {
         res.status(400).send(error);
     }

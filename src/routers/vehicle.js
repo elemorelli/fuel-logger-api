@@ -1,5 +1,6 @@
 const express = require("express");
 const sharp = require("sharp");
+const ss = require("simple-statistics");
 const Vehicle = require("../models/vehicle");
 const auth = require("../middleware/auth");
 const upload = require("../middleware/upload");
@@ -143,7 +144,33 @@ router.delete("/vehicles/:vehicle_id/picture", auth, async (req, res) => {
 router.get("/vehicles/:vehicle_id/stats", auth, async (req, res) => {
     try {
         const vehicle = await getVehicleById(req, res, true);
-        res.send(vehicle);
+
+        const distancesBetweenFillUps = [];
+        const odometerValues = [];
+
+        for (let i = 0; i < vehicle.fillUps.length; i++) {
+            const fillUp = vehicle.fillUps[i];
+            const nextFillUp = vehicle.fillUps[i + 1];
+
+            odometerValues.push(fillUp.odometer);
+
+            if (nextFillUp) {
+                distancesBetweenFillUps.push(nextFillUp.odometer - fillUp.odometer);
+            }
+        }
+
+        const averageDistanceBetweenFillUps = ss.mean(distancesBetweenFillUps);
+        const maxDistanceBetweenFillUps = ss.max(distancesBetweenFillUps);
+        const nextFillUp = ss.max(odometerValues) + averageDistanceBetweenFillUps;
+
+        const stats = {
+            averageDistanceBetweenFillUps,
+            maxDistanceBetweenFillUps,
+            nextFillUp
+            //, fillUps: vehicle.fillUps
+        };
+
+        res.send(stats);
     } catch (error) {
         res.status(400).send();
     }
