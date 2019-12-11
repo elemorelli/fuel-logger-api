@@ -7,6 +7,7 @@ const router = new express.Router();
 
 router.post("/vehicles/:vehicle_id/fillups", auth, async (req, res) => {
     try {
+        // TODO: Validate last date and last odometer value
         const vehicle = await Vehicle.findOne({
             _id: req.params.vehicle_id,
             owner: req.user._id
@@ -65,8 +66,9 @@ router.get("/vehicles/:vehicle_id/fillups/:fillup_id", auth, async (req, res) =>
 
 router.patch("/vehicles/:vehicle_id/fillups/:fillup_id", auth, async (req, res) => {
     try {
+        // TODO: Validate last date and last odometer value
         const updates = Object.keys(req.body);
-        const allowedFields = ["odometer", "fuel", "price"];
+        const allowedFields = ["odometer", "fuel", "price", "date"];
         const isValidOperation = updates.every((update) => allowedFields.includes(update));
 
         if (!isValidOperation) {

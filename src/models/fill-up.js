@@ -1,6 +1,10 @@
 const mongoose = require("mongoose");
 
 const schema = new mongoose.Schema({
+    date: {
+        type: Date,
+        default: Date.now
+    },
     odometer: {
         type: Number,
         validate(value) {
