@@ -6,6 +6,20 @@ const upload = require("../middleware/upload");
 
 const router = new express.Router();
 
+async function getVehicleById(req, res, populateFillUps) {
+    const filter = {
+        _id: req.params.vehicle_id,
+        owner: req.user._id
+    };
+    const vehicle = populateFillUps ?
+        await Vehicle.findOne(filter).populate("fillUps") :
+        await Vehicle.findOne(filter);
+    if (!vehicle) {
+        res.status(404).send();
+    }
+    return vehicle;
+}
+
 router.post("/vehicles", auth, async (req, res) => {
     const vehicle = new Vehicle({
         ...req.body,
@@ -42,18 +56,6 @@ router.get("/vehicles", auth, async (req, res) => {
         res.status(500);
     }
 });
-
-async function getVehicleById(req, res) {
-    const vehicle = await Vehicle.findOne({
-        _id: req.params.vehicle_id,
-        owner: req.user._id
-    });
-    if (!vehicle) {
-        res.status(404).send();
-    }
-    return vehicle;
-}
-
 router.get("/vehicles/:vehicle_id", auth, async (req, res) => {
 
     try {
@@ -136,6 +138,15 @@ router.delete("/vehicles/:vehicle_id/picture", auth, async (req, res) => {
     vehicle.picture = undefined;
     await vehicle.save();
     res.send();
+});
+
+router.get("/vehicles/:vehicle_id/stats", auth, async (req, res) => {
+    try {
+        const vehicle = await getVehicleById(req, res, true);
+        res.send(vehicle);
+    } catch (error) {
+        res.status(400).send();
+    }
 });
 
 module.exports = router;

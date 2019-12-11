@@ -5,20 +5,15 @@ const auth = require("../middleware/auth");
 
 const router = new express.Router();
 
-async function getVehicleById(req, res) {
-    const vehicle = await Vehicle.findOne({
-        _id: req.params.vehicle_id,
-        owner: req.user._id
-    });
-    if (!vehicle) {
-        res.status(404).send();
-    }
-    return vehicle;
-}
-
 router.post("/vehicles/:vehicle_id/fillups", auth, async (req, res) => {
     try {
-        const vehicle = await getVehicleById(req, res);
+        const vehicle = await Vehicle.findOne({
+            _id: req.params.vehicle_id,
+            owner: req.user._id
+        });
+        if (!vehicle) {
+            res.status(404).send();
+        }
 
         const fillUp = new FillUp({
             ...req.body,
@@ -34,12 +29,15 @@ router.post("/vehicles/:vehicle_id/fillups", auth, async (req, res) => {
 
 router.get("/vehicles/:vehicle_id/fillups", auth, async (req, res) => {
     try {
-        // TODO: Replace with easier way to validate user -> vehicule
-        await getVehicleById(req, res);
-        const fillUps = await FillUp.find({
-            owner: req.params.vehicle_id
-        });
-        res.send(fillUps);
+        const vehicle = await Vehicle.findOne({
+            _id: req.params.vehicle_id,
+            owner: req.user._id
+        }).populate("fillUps");
+        if (!vehicle) {
+            res.status(404).send();
+        }
+
+        res.send(vehicle.fillUps);
     } catch (error) {
         res.status(400).send();
     }
@@ -47,14 +45,19 @@ router.get("/vehicles/:vehicle_id/fillups", auth, async (req, res) => {
 
 router.get("/vehicles/:vehicle_id/fillups/:fillup_id", auth, async (req, res) => {
     try {
-        // TODO: Replace with easier way to validate user -> vehicule
-        await getVehicleById(req, res);
+        const vehicle =
+            await Vehicle.findOne({
+                _id: req.params.vehicle_id,
+                owner: req.user._id
+            }).populate({
+                path: "fillUps",
+                match: { _id: { $eq: req.params.fillup_id } }
+            });
+        if (!vehicle || !vehicle.fillUps || !vehicle.fillUps.length) {
+            res.status(404).send();
+        }
 
-        const fillUp = await FillUp.findOne({
-            _id: req.params.fillup_id,
-            owner: req.params.vehicle_id
-        });
-        res.send(fillUp);
+        res.send(vehicle.fillUps[0]);
     } catch (error) {
         res.status(400).send();
     }
@@ -70,16 +73,19 @@ router.patch("/vehicles/:vehicle_id/fillups/:fillup_id", auth, async (req, res) 
             return res.status(400).send({ error: "Invalid fields" });
         }
 
-        // TODO: Replace with easier way to validate user -> vehicule
-        await getVehicleById(req, res);
-
-        const fillUp = await FillUp.findOne({
-            _id: req.params.fillup_id,
-            owner: req.params.vehicle_id
-        });
-        if (!fillUp) {
+        const vehicle =
+            await Vehicle.findOne({
+                _id: req.params.vehicle_id,
+                owner: req.user._id
+            }).populate({
+                path: "fillUps",
+                match: { _id: { $eq: req.params.fillup_id } }
+            });
+        if (!vehicle || !vehicle.fillUps || !vehicle.fillUps.length) {
             res.status(404).send();
         }
+
+        const fillUp = vehicle.fillUps[0];
 
         allowedFields.forEach((field) => fillUp[field] = req.body[field]);
         await fillUp.save();
@@ -93,8 +99,13 @@ router.delete("/vehicles/:vehicle_id/fillups/:fillup_id", auth, async (req, res)
 
     try {
         // TODO: Replace with easier way to validate user -> vehicule
-        await getVehicleById(req, res);
-
+        const vehicle = await Vehicle.findOne({
+            _id: req.params.vehicle_id,
+            owner: req.user._id
+        });
+        if (!vehicle) {
+            res.status(404).send();
+        }
         const fillUp = await FillUp.findOneAndDelete({
             _id: req.params.fillup_id,
             owner: req.params.vehicle_id
