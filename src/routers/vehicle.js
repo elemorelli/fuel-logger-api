@@ -1,20 +1,17 @@
 const express = require("express");
 const sharp = require("sharp");
-const ss = require("simple-statistics");
 const Vehicle = require("../models/vehicle");
 const auth = require("../middleware/auth");
 const upload = require("../middleware/upload");
 
 const router = new express.Router();
 
-async function getVehicleById(req, res, populateFillUps) {
+async function getVehicleById(req, res) {
     const filter = {
         _id: req.params.vehicle_id,
         owner: req.user._id
     };
-    const vehicle = populateFillUps ?
-        await Vehicle.findOne(filter).populate({ path: "fillUps", options: { sort: { "odometer": 1 } } }) :
-        await Vehicle.findOne(filter);
+    const vehicle = await Vehicle.findOne(filter);
     if (!vehicle) {
         res.status(404).send();
     }
@@ -134,47 +131,6 @@ router.delete("/vehicles/:vehicle_id/picture", auth, async (req, res) => {
     vehicle.picture = undefined;
     await vehicle.save();
     res.send();
-});
-
-router.get("/vehicles/:vehicle_id/stats", auth, async (req, res) => {
-    try {
-        const vehicle = await getVehicleById(req, res, true);
-
-        const distancesBetweenFillUps = [];
-        const odometerValues = [];
-
-        for (let i = 0; i < vehicle.fillUps.length; i++) {
-            const fillUp = vehicle.fillUps[i];
-            const nextFillUp = vehicle.fillUps[i + 1];
-
-            odometerValues.push(fillUp.odometer);
-
-            if (nextFillUp) {
-                distancesBetweenFillUps.push(nextFillUp.odometer - fillUp.odometer);
-            }
-        }
-
-        const averageDistanceBetweenFillUps = distancesBetweenFillUps.length ?
-            ss.mean(distancesBetweenFillUps) : undefined;
-        const maxDistanceBetweenFillUps = distancesBetweenFillUps.length ?
-            ss.max(distancesBetweenFillUps) : undefined;
-        const nextFillUp = averageDistanceBetweenFillUps ?
-            ss.max(odometerValues) + averageDistanceBetweenFillUps : undefined;
-        const maxDistanceToFillUp = maxDistanceBetweenFillUps ?
-            ss.max(odometerValues) + maxDistanceBetweenFillUps : undefined;
-
-        const stats = {
-            averageDistanceBetweenFillUps: averageDistanceBetweenFillUps.toFixed(2),
-            maxDistanceBetweenFillUps: maxDistanceBetweenFillUps.toFixed(2),
-            nextFillUp: nextFillUp.toFixed(2),
-            maxDistanceToFillUp: maxDistanceToFillUp.toFixed(2)
-            // , fillUps: vehicle.fillUps
-        };
-
-        res.send(stats);
-    } catch (error) {
-        res.status(400).send();
-    }
 });
 
 module.exports = router;
