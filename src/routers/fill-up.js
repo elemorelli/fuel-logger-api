@@ -28,6 +28,34 @@ router.post("/vehicles/:vehicle_id/fillups", auth, async (req, res) => {
     }
 });
 
+// TODO: Only for development? Maybe an import module?
+router.put("/vehicles/:vehicle_id/fillups", auth, async (req, res) => {
+    try {
+        // TODO: Validate last date and last odometer value
+        const vehicle = await Vehicle.findOne({
+            _id: req.params.vehicle_id,
+            owner: req.user._id
+        });
+        if (!vehicle) {
+            res.status(404).send();
+        }
+
+        for (const item of req.body) {
+
+            const fillUp = new FillUp({
+                ...item,
+                owner: vehicle._id
+            });
+
+            await fillUp.save();
+        }
+
+        res.status(201).send(vehicle.fillUps);
+    } catch (error) {
+        res.status(400).send(error);
+    }
+});
+
 router.get("/vehicles/:vehicle_id/fillups", auth, async (req, res) => {
     try {
         const vehicle = await Vehicle.findOne({
