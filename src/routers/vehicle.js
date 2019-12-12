@@ -13,7 +13,7 @@ async function getVehicleById(req, res, populateFillUps) {
         owner: req.user._id
     };
     const vehicle = populateFillUps ?
-        await Vehicle.findOne(filter).populate("fillUps") :
+        await Vehicle.findOne(filter).populate({ path: "fillUps", options: { sort: { "odometer": 1 } } }) :
         await Vehicle.findOne(filter);
     if (!vehicle) {
         res.status(404).send();
@@ -160,11 +160,14 @@ router.get("/vehicles/:vehicle_id/stats", auth, async (req, res) => {
             ss.max(distancesBetweenFillUps) : undefined;
         const nextFillUp = averageDistanceBetweenFillUps ?
             ss.max(odometerValues) + averageDistanceBetweenFillUps : undefined;
+        const maxDistanceToFillUp = maxDistanceBetweenFillUps ?
+            ss.max(odometerValues) + maxDistanceBetweenFillUps : undefined;
 
         const stats = {
-            averageDistanceBetweenFillUps,
-            maxDistanceBetweenFillUps,
-            nextFillUp
+            averageDistanceBetweenFillUps: averageDistanceBetweenFillUps.toFixed(2),
+            maxDistanceBetweenFillUps: maxDistanceBetweenFillUps.toFixed(2),
+            nextFillUp: nextFillUp.toFixed(2),
+            maxDistanceToFillUp: maxDistanceToFillUp.toFixed(2)
             // , fillUps: vehicle.fillUps
         };
 
