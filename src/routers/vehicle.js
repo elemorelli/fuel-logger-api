@@ -69,7 +69,7 @@ router.get("/vehicles/:vehicle_id", auth, async (req, res) => {
 
 router.patch("/vehicles/:vehicle_id", auth, async (req, res) => {
     const updates = Object.keys(req.body);
-    const allowedFields = ["model"];
+    const allowedFields = ["model, fuelCapacity"];
     const isValidOperation = updates.every((update) => allowedFields.includes(update));
 
     if (!isValidOperation) {
@@ -88,13 +88,8 @@ router.patch("/vehicles/:vehicle_id", auth, async (req, res) => {
 
 router.delete("/vehicles/:vehicle_id", auth, async (req, res) => {
     try {
-        const vehicle = await Vehicle.findOneAndDelete({
-            _id: req.params.vehicle_id,
-            owner: req.user._id
-        });
-        if (!vehicle) {
-            return res.status(404).send();
-        }
+        const vehicle = await getVehicleById(req, res);
+        vehicle.remove();
         res.send();
     } catch (error) {
         res.status(500).send(error);
@@ -159,15 +154,18 @@ router.get("/vehicles/:vehicle_id/stats", auth, async (req, res) => {
             }
         }
 
-        const averageDistanceBetweenFillUps = ss.mean(distancesBetweenFillUps);
-        const maxDistanceBetweenFillUps = ss.max(distancesBetweenFillUps);
-        const nextFillUp = ss.max(odometerValues) + averageDistanceBetweenFillUps;
+        const averageDistanceBetweenFillUps = distancesBetweenFillUps.length ?
+            ss.mean(distancesBetweenFillUps) : undefined;
+        const maxDistanceBetweenFillUps = distancesBetweenFillUps.length ?
+            ss.max(distancesBetweenFillUps) : undefined;
+        const nextFillUp = averageDistanceBetweenFillUps ?
+            ss.max(odometerValues) + averageDistanceBetweenFillUps : undefined;
 
         const stats = {
             averageDistanceBetweenFillUps,
             maxDistanceBetweenFillUps,
             nextFillUp
-            //, fillUps: vehicle.fillUps
+            // , fillUps: vehicle.fillUps
         };
 
         res.send(stats);

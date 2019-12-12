@@ -11,6 +11,14 @@ const schema = new mongoose.Schema({
         type: String,
         trim: true
     },
+    fuelCapacity: {
+        type: Number,
+        validate(value) {
+            if (value < 0) {
+                throw new Error("Invalid number");
+            }
+        }
+    },
     picture: {
         type: Buffer
     },
@@ -37,9 +45,9 @@ schema.methods.toJSON = function () {
 };
 
 schema.pre("remove", async function (next) {
-    const user = this;
+    const vehicle = this;
     await FillUp.deleteMany({
-        owner: user._id
+        owner: vehicle._id
     });
     next();
 });
