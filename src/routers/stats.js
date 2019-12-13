@@ -44,7 +44,7 @@ router.get("/vehicles/:vehicle_id/stats", auth, async (req, res) => {
         }
 
         let distancesBetweenFillUps = [];
-        let fuelConsumptions = [];
+        let distancePerLiters = [];
         const odometerValues = [];
 
         for (let i = 0; i < vehicle.fillUps.length; i++) {
@@ -54,16 +54,16 @@ router.get("/vehicles/:vehicle_id/stats", auth, async (req, res) => {
             odometerValues.push(fillUp.odometer);
 
             if (previousFillUp) {
-                const distanceTraveled = fillUp.odometer - previousFillUp.odometer;
-                const fuelConsumption = distanceTraveled / fillUp.fuel;
-                distancesBetweenFillUps.push(distanceTraveled);
-                fuelConsumptions.push(fuelConsumption);
+                const distanceBetweenFillUps = fillUp.odometer - previousFillUp.odometer;
+                const distancePerLiter = distanceBetweenFillUps / fillUp.fuel;
+                distancesBetweenFillUps.push(distanceBetweenFillUps);
+                distancePerLiters.push(distancePerLiter);
             }
         }
 
         if (req.query.removeOutliers === "true") {
             distancesBetweenFillUps = filterOutliers(distancesBetweenFillUps);
-            fuelConsumptions = filterOutliers(fuelConsumptions);
+            distancePerLiters = filterOutliers(distancePerLiters);
         }
 
         const maxOdometerValue = odometerValues[odometerValues.length - 1];
@@ -77,12 +77,12 @@ router.get("/vehicles/:vehicle_id/stats", auth, async (req, res) => {
         const maxDistanceToFillUp = maxDistanceBetweenFillUps ?
             maxOdometerValue + maxDistanceBetweenFillUps : undefined;
 
-        const averageFuelConsumption = fuelConsumptions.length ?
-            ss.mean(fuelConsumptions) : undefined;
-        const maxFuelConsumption = fuelConsumptions.length ?
-            ss.max(fuelConsumptions) : undefined;
-        const minFuelConsumption = fuelConsumptions.length ?
-            ss.min(fuelConsumptions) : undefined;
+        const averageFuelConsumption = distancePerLiters.length ?
+            ss.mean(distancePerLiters) : undefined;
+        const maxFuelConsumption = distancePerLiters.length ?
+            ss.max(distancePerLiters) : undefined;
+        const minFuelConsumption = distancePerLiters.length ?
+            ss.min(distancePerLiters) : undefined;
 
         const stats = {
             averageDistanceBetweenFillUps: averageDistanceBetweenFillUps.toFixed(2),
