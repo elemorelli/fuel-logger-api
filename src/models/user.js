@@ -98,6 +98,7 @@ schema.pre("save", async function (next) {
 
 schema.pre("remove", async function (next) {
     const user = this;
+    // TODO: Delete everything? Or just unbind the vehicles from this document?? See telegram-user.js
     await Vehicle.deleteMany({
         owner: user._id
     });
