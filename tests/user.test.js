@@ -82,7 +82,7 @@ test("Should not login nonexisting user", async () => {
         .send({
             email: "nonregistered@user.com",
             password: userOne.password
-        }).expect(400);
+        }).expect(404);
 });
 
 test("Should not login user with bad password", async () => {
@@ -91,7 +91,7 @@ test("Should not login user with bad password", async () => {
         .send({
             email: userOne.email,
             password: "invalidPassword"
-        }).expect(400);
+        }).expect(404);
 });
 
 test("Should get profile for user", async () => {
