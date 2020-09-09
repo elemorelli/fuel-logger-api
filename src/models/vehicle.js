@@ -13,11 +13,7 @@ const schema = new mongoose.Schema({
     },
     fuelCapacity: {
         type: Number,
-        validate(value) {
-            if (value < 0) {
-                throw new Error("Invalid number");
-            }
-        }
+        min: 0
     },
     picture: {
         type: Buffer

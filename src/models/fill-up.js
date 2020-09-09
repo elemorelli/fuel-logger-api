@@ -7,27 +7,15 @@ const schema = new mongoose.Schema({
     },
     odometer: {
         type: Number,
-        validate(value) {
-            if (value < 0) {
-                throw new Error("Invalid number");
-            }
-        }
+        min: 0
     },
     fuel: {
         type: Number,
-        validate(value) {
-            if (value < 0) {
-                throw new Error("Invalid number");
-            }
-        }
+        min: 0
     },
     price: {
         type: Number,
-        validate(value) {
-            if (value < 0) {
-                throw new Error("Invalid number");
-            }
-        }
+        min: 0
     },
     owner: {
         type: mongoose.Schema.Types.ObjectId,

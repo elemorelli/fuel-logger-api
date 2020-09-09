@@ -16,12 +16,16 @@ const schema = new mongoose.Schema({
         required: true,
         trim: true,
         minlength: 7,
-        validate(value) {
-            const result = passwordValidator.test(value);
-            if (!result.strong) {
-                throw new Error(result.errors);
+        validate: {
+            validator: (value) => {
+                const result = passwordValidator.test(value);
+                if (!result.strong) {
+                    throw new Error(result.errors.join(", "));
+                }
+                return true;
             }
         }
+
     },
     email: {
         type: String,
@@ -29,10 +33,8 @@ const schema = new mongoose.Schema({
         unique: true,
         trim: true,
         lowercase: true,
-        validate(value) {
-            if (!validator.isEmail(value)) {
-                throw new Error("Invalid email");
-            }
+        validate: {
+            validator: validator.isEmail
         }
     },
     avatar: {
