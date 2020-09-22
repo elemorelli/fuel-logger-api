@@ -1,3 +1,4 @@
+const { JWT_SECRET } = require("../environment");
 const mongoose = require("mongoose");
 const validator = require("validator");
 const bcrypt = require("bcryptjs");
@@ -74,7 +75,7 @@ schema.methods.generateAuthToken = async function () {
     const user = this;
     const token = jwt.sign(
         { _id: user._id.toString() },
-        process.env.JWT_SECRET,
+        JWT_SECRET,
         { expiresIn: "300d" }); // TODO: Reduce expiration and allow to refresh the token
     user.tokens = user.tokens.concat({ token });
     await user.save();

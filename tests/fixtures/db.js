@@ -1,3 +1,4 @@
+const { JWT_SECRET } = require("../environment");
 const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
 const fs = require("fs");
@@ -8,7 +9,7 @@ const createUser = (name, email, password, avatarPath) => {
     const avatar = avatarPath ? fs.readFileSync(__dirname + "/" + avatarPath) : undefined;
     return {
         _id, name, email, password, avatar, tokens: [{
-            token: jwt.sign({ _id }, process.env.JWT_SECRET)
+            token: jwt.sign({ _id }, JWT_SECRET)
         }]
     };
 };

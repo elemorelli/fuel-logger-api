@@ -1,14 +1,17 @@
+console.clear();
+
+const { PORT, SERVER_KEY, SERVER_CERT } = require("./environment");
+const https = require("https");
+const fs = require("fs");
 const app = require("./app");
-const requiredEnvVariables = ["PORT", "MONGODB_URL", "JWT_SECRET"];
+require("./db/mongoose");
+require("./telegram-bot");
 
-requiredEnvVariables.forEach((envVariable) => {
-    if (!process.env[envVariable]) {
-        console.error(`WARNING: Environment variable '${envVariable}' is required`);
-    }
-});
+const server = https.createServer({
+    key: fs.readFileSync(SERVER_KEY),
+    cert: fs.readFileSync(SERVER_CERT)
+}, app);
 
-const port = process.env.PORT;
-
-app.listen(port, () => {
-    console.log("Server is up on port " + port);
+server.listen(PORT, () => {
+    console.log("Server is up on port " + PORT);
 });
