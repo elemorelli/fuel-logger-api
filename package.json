@@ -7,8 +7,8 @@
   "scripts": {
     "start": "node src/server.js",
     "lint": "eslint . --ext .js",
-    "dev": "env-cmd -f ./config/dev.env nodemon src/server-dev.js",
-    "test": "env-cmd -f ./config/test.env jest --watch --runInBand --watchAll --coverage"
+    "dev": "env-cmd nodemon src/server-dev.js",
+    "test": "env-cmd -f .env.test jest --watch --runInBand --watchAll --coverage"
   },
   "jest": {
     "testEnvironment": "node"

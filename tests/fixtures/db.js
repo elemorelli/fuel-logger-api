@@ -1,4 +1,4 @@
-const { JWT_SECRET } = require('../environment');
+const { JWT_SECRET } = require('../../src/environment');
 const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
 const fs = require('fs');
