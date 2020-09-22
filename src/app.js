@@ -1,4 +1,5 @@
 const express = require('express');
+const pino = require('pino-http')({ autoLogging: false });
 
 const userRouter = require('./routers/user');
 const vehicleRouter = require('./routers/vehicle');
@@ -6,6 +7,8 @@ const fillUpRouter = require('./routers/fill-up');
 const statsRouter = require('./routers/stats');
 
 const app = express();
+
+app.use(pino);
 
 app.use(express.json());
 app.use(userRouter);

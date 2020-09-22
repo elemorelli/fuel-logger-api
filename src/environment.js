@@ -1,8 +1,9 @@
 const requiredEnvVariables = ['PORT', 'MONGODB_URL', 'JWT_SECRET', 'SERVER_URL', 'TELEGRAM_BOT_TOKEN'];
+const logger = require('pino')();
 
 requiredEnvVariables.forEach((envVariable) => {
     if (!process.env[envVariable]) {
-        console.error(`WARNING: Environment variable '${envVariable}' is required`);
+        logger.error(`WARNING: Environment variable '${envVariable}' is required`);
     }
 });
 

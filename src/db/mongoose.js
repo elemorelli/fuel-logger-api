@@ -1,4 +1,5 @@
 const { MONGODB_URL } = require('../environment');
+const logger = require('pino')();
 const mongoose = require('mongoose');
 
 mongoose.connect(MONGODB_URL, {
@@ -7,8 +8,8 @@ mongoose.connect(MONGODB_URL, {
     useFindAndModify: false,
     useUnifiedTopology: true
 }).then(() => {
-    console.log('Successfully connected to the DB');
+    logger.info('Successfully connected to the DB');
 }).catch((error) => {
-    console.error('Error connecting to the DB', error);
+    logger.error('Error connecting to the DB', error);
     throw new Error(`Error connecting to the DB: ${error.message}`);
 });

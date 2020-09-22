@@ -49,6 +49,7 @@ router.post('/users/logout/all', auth, async (req, res) => {
 });
 
 router.get('/users/me', auth, async (req, res) => {
+    // req.log.info('something');
     res.send(req.user);
 });
 
