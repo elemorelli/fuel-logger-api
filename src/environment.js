@@ -1,4 +1,4 @@
-const requiredEnvVariables = ["PORT", "MONGODB_URL", "JWT_SECRET", "SERVER_KEY", "SERVER_CERT", "SERVER_URL", "TELEGRAM_BOT_TOKEN"];
+const requiredEnvVariables = ["PORT", "MONGODB_URL", "JWT_SECRET", "SERVER_URL", "TELEGRAM_BOT_TOKEN"];
 
 requiredEnvVariables.forEach((envVariable) => {
     if (!process.env[envVariable]) {
