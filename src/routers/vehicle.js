@@ -1,8 +1,8 @@
-const express = require("express");
-const sharp = require("sharp");
-const Vehicle = require("../models/vehicle");
-const auth = require("../middleware/auth");
-const upload = require("../middleware/upload");
+const express = require('express');
+const sharp = require('sharp');
+const Vehicle = require('../models/vehicle');
+const auth = require('../middleware/auth');
+const upload = require('../middleware/upload');
 
 const router = new express.Router();
 
@@ -18,7 +18,7 @@ async function getVehicleById(req, res) {
     return vehicle;
 }
 
-router.post("/vehicles", auth, async (req, res) => {
+router.post('/vehicles', auth, async (req, res) => {
     const vehicle = new Vehicle({
         ...req.body,
         owner: req.user._id
@@ -32,12 +32,12 @@ router.post("/vehicles", auth, async (req, res) => {
     }
 });
 
-router.get("/vehicles", auth, async (req, res) => {
+router.get('/vehicles', auth, async (req, res) => {
     const matcher = {};
     const sort = {};
 
     if (req.query.sortBy) {
-        sort[req.query.sortBy] = req.query.order === "desc" ? -1 : 1;
+        sort[req.query.sortBy] = req.query.order === 'desc' ? -1 : 1;
     }
 
     try {
@@ -54,7 +54,7 @@ router.get("/vehicles", auth, async (req, res) => {
         res.status(500);
     }
 });
-router.get("/vehicles/:vehicle_id", auth, async (req, res) => {
+router.get('/vehicles/:vehicle_id', auth, async (req, res) => {
 
     try {
         const vehicle = await getVehicleById(req, res);
@@ -64,13 +64,13 @@ router.get("/vehicles/:vehicle_id", auth, async (req, res) => {
     }
 });
 
-router.patch("/vehicles/:vehicle_id", auth, async (req, res) => {
+router.patch('/vehicles/:vehicle_id', auth, async (req, res) => {
     const updates = Object.keys(req.body);
-    const allowedFields = ["model, fuelCapacity"];
+    const allowedFields = ['model, fuelCapacity'];
     const isValidOperation = updates.every((update) => allowedFields.includes(update));
 
     if (!isValidOperation) {
-        return res.status(400).send({ error: "Invalid fields" });
+        return res.status(400).send({ error: 'Invalid fields' });
     }
 
     try {
@@ -83,7 +83,7 @@ router.patch("/vehicles/:vehicle_id", auth, async (req, res) => {
     }
 });
 
-router.delete("/vehicles/:vehicle_id", auth, async (req, res) => {
+router.delete('/vehicles/:vehicle_id', auth, async (req, res) => {
     try {
         const vehicle = await getVehicleById(req, res);
         vehicle.remove();
@@ -93,7 +93,7 @@ router.delete("/vehicles/:vehicle_id", auth, async (req, res) => {
     }
 });
 
-router.post("/vehicles/:vehicle_id/picture", auth, upload.single("picture"), async (req, res) => {
+router.post('/vehicles/:vehicle_id/picture', auth, upload.single('picture'), async (req, res) => {
     try {
         const vehicle = await getVehicleById(req, res);
 
@@ -110,14 +110,14 @@ router.post("/vehicles/:vehicle_id/picture", auth, upload.single("picture"), asy
     }
 });
 
-router.get("/vehicles/:vehicle_id/picture", auth, async (req, res) => {
+router.get('/vehicles/:vehicle_id/picture', auth, async (req, res) => {
     try {
         const vehicle = await getVehicleById(req, res);
 
         if (!vehicle.picture) {
             res.status(404).send();
         } else {
-            res.set("Content-Type", "image/png");
+            res.set('Content-Type', 'image/png');
             res.send(vehicle.picture);
         }
     } catch (error) {
@@ -125,7 +125,7 @@ router.get("/vehicles/:vehicle_id/picture", auth, async (req, res) => {
     }
 });
 
-router.delete("/vehicles/:vehicle_id/picture", auth, async (req, res) => {
+router.delete('/vehicles/:vehicle_id/picture', auth, async (req, res) => {
 
     const vehicle = await getVehicleById(req, res);
     vehicle.picture = undefined;

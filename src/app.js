@@ -1,9 +1,9 @@
-const express = require("express");
+const express = require('express');
 
-const userRouter = require("./routers/user");
-const vehicleRouter = require("./routers/vehicle");
-const fillUpRouter = require("./routers/fill-up");
-const statsRouter = require("./routers/stats");
+const userRouter = require('./routers/user');
+const vehicleRouter = require('./routers/vehicle');
+const fillUpRouter = require('./routers/fill-up');
+const statsRouter = require('./routers/stats');
 
 const app = express();
 

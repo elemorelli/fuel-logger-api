@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 const schema = new mongoose.Schema({
     date: {
@@ -20,12 +20,12 @@ const schema = new mongoose.Schema({
     owner: {
         type: mongoose.Schema.Types.ObjectId,
         required: true,
-        ref: "Vehicle"
+        ref: 'Vehicle'
     }
 }, {
     timestamps: true
 });
 
-const FillUp = mongoose.model("FillUp", schema);
+const FillUp = mongoose.model('FillUp', schema);
 
 module.exports = FillUp;

@@ -1,11 +1,11 @@
-const express = require("express");
-const FillUp = require("../models/fill-up");
-const Vehicle = require("../models/vehicle");
-const auth = require("../middleware/auth");
+const express = require('express');
+const FillUp = require('../models/fill-up');
+const Vehicle = require('../models/vehicle');
+const auth = require('../middleware/auth');
 
 const router = new express.Router();
 
-router.post("/vehicles/:vehicle_id/fill-ups", auth, async (req, res) => {
+router.post('/vehicles/:vehicle_id/fill-ups', auth, async (req, res) => {
     try {
         // TODO: Validate last date and last odometer value
         const vehicle = await Vehicle.findOne({
@@ -29,7 +29,7 @@ router.post("/vehicles/:vehicle_id/fill-ups", auth, async (req, res) => {
 });
 
 // TODO: Only for development? Maybe an import module?
-router.put("/vehicles/:vehicle_id/fill-ups", auth, async (req, res) => {
+router.put('/vehicles/:vehicle_id/fill-ups', auth, async (req, res) => {
     try {
         // TODO: Validate last date and last odometer value
         const vehicle = await Vehicle.findOne({
@@ -56,12 +56,12 @@ router.put("/vehicles/:vehicle_id/fill-ups", auth, async (req, res) => {
     }
 });
 
-router.get("/vehicles/:vehicle_id/fill-ups", auth, async (req, res) => {
+router.get('/vehicles/:vehicle_id/fill-ups', auth, async (req, res) => {
     try {
         const vehicle = await Vehicle.findOne({
             _id: req.params.vehicle_id,
             owner: req.user._id
-        }).populate("fillUps");
+        }).populate('fillUps');
         if (!vehicle) {
             res.status(404).send();
         }
@@ -72,14 +72,14 @@ router.get("/vehicles/:vehicle_id/fill-ups", auth, async (req, res) => {
     }
 });
 
-router.get("/vehicles/:vehicle_id/fill-ups/:fillup_id", auth, async (req, res) => {
+router.get('/vehicles/:vehicle_id/fill-ups/:fillup_id', auth, async (req, res) => {
     try {
         const vehicle =
             await Vehicle.findOne({
                 _id: req.params.vehicle_id,
                 owner: req.user._id
             }).populate({
-                path: "fillUps",
+                path: 'fillUps',
                 match: { _id: { $eq: req.params.fillup_id } }
             });
         if (!vehicle || !vehicle.fillUps || !vehicle.fillUps.length) {
@@ -92,15 +92,15 @@ router.get("/vehicles/:vehicle_id/fill-ups/:fillup_id", auth, async (req, res) =
     }
 });
 
-router.patch("/vehicles/:vehicle_id/fill-ups/:fillup_id", auth, async (req, res) => {
+router.patch('/vehicles/:vehicle_id/fill-ups/:fillup_id', auth, async (req, res) => {
     try {
         // TODO: Validate last date and last odometer value
         const updates = Object.keys(req.body);
-        const allowedFields = ["odometer", "fuel", "price", "date"];
+        const allowedFields = ['odometer', 'fuel', 'price', 'date'];
         const isValidOperation = updates.every((update) => allowedFields.includes(update));
 
         if (!isValidOperation) {
-            return res.status(400).send({ error: "Invalid fields" });
+            return res.status(400).send({ error: 'Invalid fields' });
         }
 
         const vehicle =
@@ -108,7 +108,7 @@ router.patch("/vehicles/:vehicle_id/fill-ups/:fillup_id", auth, async (req, res)
                 _id: req.params.vehicle_id,
                 owner: req.user._id
             }).populate({
-                path: "fillUps",
+                path: 'fillUps',
                 match: { _id: { $eq: req.params.fillup_id } }
             });
         if (!vehicle || !vehicle.fillUps || !vehicle.fillUps.length) {
@@ -125,7 +125,7 @@ router.patch("/vehicles/:vehicle_id/fill-ups/:fillup_id", auth, async (req, res)
     }
 });
 
-router.delete("/vehicles/:vehicle_id/fill-ups/:fillup_id", auth, async (req, res) => {
+router.delete('/vehicles/:vehicle_id/fill-ups/:fillup_id', auth, async (req, res) => {
 
     try {
         // TODO: Replace with easier way to validate user -> vehicule

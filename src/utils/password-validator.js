@@ -1,8 +1,8 @@
-const passwordValidator = require("owasp-password-strength-test");
+const passwordValidator = require('owasp-password-strength-test');
 
 // TODO: Populate with blacklisted words
 const blacklistedWords = [
-    "password", "qwerty"
+    'password', 'qwerty'
 ];
 
 passwordValidator.config({
@@ -17,7 +17,7 @@ passwordValidator.tests.required.push((password) => {
     });
 
     if (hasABlacklistedWord) {
-        return "The password has a commonly used word.";
+        return 'The password has a commonly used word.';
     }
 });
 

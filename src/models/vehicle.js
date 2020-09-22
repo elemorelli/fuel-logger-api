@@ -1,5 +1,5 @@
-const mongoose = require("mongoose");
-const FillUp = require("./fill-up");
+const mongoose = require('mongoose');
+const FillUp = require('./fill-up');
 
 const schema = new mongoose.Schema({
     model: {
@@ -20,20 +20,20 @@ const schema = new mongoose.Schema({
     },
     owner: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "User"
+        ref: 'User'
     },
     telegramOwner: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "TelegramOwner"
+        ref: 'TelegramOwner'
     }
 }, {
     timestamps: true
 });
 
-schema.virtual("fillUps", {
-    ref: "FillUp",
-    localField: "_id",
-    foreignField: "owner"
+schema.virtual('fillUps', {
+    ref: 'FillUp',
+    localField: '_id',
+    foreignField: 'owner'
 });
 
 schema.methods.toJSON = function () {
@@ -43,7 +43,7 @@ schema.methods.toJSON = function () {
     return vehicleProfile;
 };
 
-schema.pre("remove", async function (next) {
+schema.pre('remove', async function (next) {
     const vehicle = this;
     await FillUp.deleteMany({
         owner: vehicle._id
@@ -51,6 +51,6 @@ schema.pre("remove", async function (next) {
     next();
 });
 
-const Vehicle = mongoose.model("Vehicle", schema);
+const Vehicle = mongoose.model('Vehicle', schema);
 
 module.exports = Vehicle;

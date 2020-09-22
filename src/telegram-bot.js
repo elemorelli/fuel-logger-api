@@ -1,7 +1,7 @@
-const { SERVER_URL, TELEGRAM_BOT_TOKEN } = require ("./environment");
+const { SERVER_URL, TELEGRAM_BOT_TOKEN } = require ('./environment');
 
-const TelegramBot = require("node-telegram-bot-api");
-const app = require("./app");
+const TelegramBot = require('node-telegram-bot-api');
+const app = require('./app');
 
 const bot = new TelegramBot(TELEGRAM_BOT_TOKEN);
 bot.setWebHook(`${SERVER_URL}/bot${TELEGRAM_BOT_TOKEN}`);
@@ -17,12 +17,12 @@ bot.onText(/\/help/, msg => {
         reply_to_message_id: msg.message_id,
         reply_markup: JSON.stringify({
           keyboard: [
-            ["Log in"],
-            ["Sign up"]
+            ['Log in'],
+            ['Sign up']
           ]
         })
       };
-      bot.sendMessage(msg.chat.id, "What to do?", opts);
+      bot.sendMessage(msg.chat.id, 'What to do?', opts);
 });
 
 module.exports = bot;

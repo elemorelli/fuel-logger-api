@@ -1,7 +1,7 @@
-const express = require("express");
-const ss = require("simple-statistics");
-const Vehicle = require("../models/vehicle");
-const auth = require("../middleware/auth");
+const express = require('express');
+const ss = require('simple-statistics');
+const Vehicle = require('../models/vehicle');
+const auth = require('../middleware/auth');
 
 const router = new express.Router();
 
@@ -28,15 +28,15 @@ const filterOutliers = (list) => {
     return values.filter((x) => (x >= minValue) && (x <= maxValue));
 };
 
-router.get("/vehicles/:vehicle_id/stats", auth, async (req, res) => {
+router.get('/vehicles/:vehicle_id/stats', auth, async (req, res) => {
     try {
         const vehicle = await Vehicle.findOne({
             _id: req.params.vehicle_id,
             owner: req.user._id
         }).populate({
-            path: "fillUps",
+            path: 'fillUps',
             options: {
-                sort: { "odometer": 1 }
+                sort: { 'odometer': 1 }
             }
         });
         if (!vehicle) {
@@ -61,7 +61,7 @@ router.get("/vehicles/:vehicle_id/stats", auth, async (req, res) => {
             }
         }
 
-        if (req.query.removeOutliers === "true") {
+        if (req.query.removeOutliers === 'true') {
             distancesBetweenFillUps = filterOutliers(distancesBetweenFillUps);
             distancePerLiters = filterOutliers(distancePerLiters);
         }
