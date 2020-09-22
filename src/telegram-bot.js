@@ -11,8 +11,18 @@ app.post(`/bot${TELEGRAM_BOT_TOKEN}`, (req, res) => {
     res.sendStatus(200);
 });
 
-bot.on("message", msg => {
-    bot.sendMessage(msg.chat.id, "Message received!");
+bot.onText(/\/help/, msg => {
+    
+    const opts = {
+        reply_to_message_id: msg.message_id,
+        reply_markup: JSON.stringify({
+          keyboard: [
+            ["Log in"],
+            ["Sign up"]
+          ]
+        })
+      };
+      bot.sendMessage(msg.chat.id, "What to do?", opts);
 });
 
 module.exports = bot;
