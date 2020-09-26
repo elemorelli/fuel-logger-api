@@ -21,10 +21,6 @@ const schema = new mongoose.Schema({
     owner: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
-    },
-    telegramOwner: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'TelegramOwner'
     }
 }, {
     timestamps: true

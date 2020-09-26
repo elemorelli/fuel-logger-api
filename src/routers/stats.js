@@ -69,20 +69,20 @@ router.get('/vehicles/:vehicle_id/stats', auth, async (req, res) => {
         const maxOdometerValue = odometerValues[odometerValues.length - 1];
 
         const averageDistanceBetweenFillUps = distancesBetweenFillUps.length ?
-            ss.mean(distancesBetweenFillUps) : undefined;
+            ss.mean(distancesBetweenFillUps) : 0;
         const maxDistanceBetweenFillUps = distancesBetweenFillUps.length ?
-            ss.max(distancesBetweenFillUps) : undefined;
+            ss.max(distancesBetweenFillUps) : 0;
         const nextFillUp = averageDistanceBetweenFillUps ?
-            maxOdometerValue + averageDistanceBetweenFillUps : undefined;
+            maxOdometerValue + averageDistanceBetweenFillUps : 0;
         const maxDistanceToFillUp = maxDistanceBetweenFillUps ?
-            maxOdometerValue + maxDistanceBetweenFillUps : undefined;
+            maxOdometerValue + maxDistanceBetweenFillUps : 0;
 
         const averageFuelConsumption = distancePerLiters.length ?
-            ss.mean(distancePerLiters) : undefined;
+            ss.mean(distancePerLiters) : 0;
         const maxFuelConsumption = distancePerLiters.length ?
-            ss.max(distancePerLiters) : undefined;
+            ss.max(distancePerLiters) : 0;
         const minFuelConsumption = distancePerLiters.length ?
-            ss.min(distancePerLiters) : undefined;
+            ss.min(distancePerLiters) : 0;
 
         const stats = {
             averageDistanceBetweenFillUps: averageDistanceBetweenFillUps.toFixed(2),
@@ -96,7 +96,7 @@ router.get('/vehicles/:vehicle_id/stats', auth, async (req, res) => {
 
         res.send(stats);
     } catch (error) {
-        res.status(400).send();
+        res.status(500).send();
     }
 });
 

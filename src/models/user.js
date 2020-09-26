@@ -38,6 +38,9 @@ const schema = new mongoose.Schema({
             validator: validator.isEmail
         }
     },
+    telegramId: {
+        type: Number,
+    },
     avatar: {
         type: Buffer
     },
@@ -101,7 +104,6 @@ schema.pre('save', async function (next) {
 
 schema.pre('remove', async function (next) {
     const user = this;
-    // TODO: Delete everything? Or just unbind the vehicles from this document?? See telegram-user.js
     await Vehicle.deleteMany({
         owner: user._id
     });
