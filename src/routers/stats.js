@@ -1,32 +1,10 @@
 const express = require('express');
-const ss = require('simple-statistics');
 const Vehicle = require('../models/vehicle');
 const auth = require('../middleware/auth');
 
+const { calculateVehicleStats } = require('../services/stats');
+
 const router = new express.Router();
-
-const filterOutliers = (list) => {
-    if (list.length < 4)
-        return list;
-
-    let values, q1, q3, iqr, maxValue, minValue;
-
-    values = list.slice().sort((a, b) => a - b);
-
-    if ((values.length / 4) % 1 === 0) {
-        q1 = 1 / 2 * (values[(values.length / 4)] + values[(values.length / 4) + 1]);
-        q3 = 1 / 2 * (values[(values.length * (3 / 4))] + values[(values.length * (3 / 4)) + 1]);
-    } else {
-        q1 = values[Math.floor(values.length / 4 + 1)];
-        q3 = values[Math.ceil(values.length * (3 / 4) + 1)];
-    }
-
-    iqr = q3 - q1;
-    maxValue = q3 + iqr * 1.5;
-    minValue = q1 - iqr * 1.5;
-
-    return values.filter((x) => (x >= minValue) && (x <= maxValue));
-};
 
 router.get('/vehicles/:vehicle_id/stats', auth, async (req, res) => {
     try {
@@ -42,57 +20,9 @@ router.get('/vehicles/:vehicle_id/stats', auth, async (req, res) => {
         if (!vehicle) {
             res.status(404).send();
         }
+        const removeOutliers = Boolean(req.query.removeOutliers);
 
-        let distancesBetweenFillUps = [];
-        let distancePerLiters = [];
-        const odometerValues = [];
-
-        for (let i = 0; i < vehicle.fillUps.length; i++) {
-            const fillUp = vehicle.fillUps[i];
-            const previousFillUp = vehicle.fillUps[i - 1];
-
-            odometerValues.push(fillUp.odometer);
-
-            if (previousFillUp) {
-                const distanceBetweenFillUps = fillUp.odometer - previousFillUp.odometer;
-                const distancePerLiter = distanceBetweenFillUps / fillUp.fuel;
-                distancesBetweenFillUps.push(distanceBetweenFillUps);
-                distancePerLiters.push(distancePerLiter);
-            }
-        }
-
-        if (req.query.removeOutliers === 'true') {
-            distancesBetweenFillUps = filterOutliers(distancesBetweenFillUps);
-            distancePerLiters = filterOutliers(distancePerLiters);
-        }
-
-        const maxOdometerValue = odometerValues[odometerValues.length - 1];
-
-        const averageDistanceBetweenFillUps = distancesBetweenFillUps.length ?
-            ss.mean(distancesBetweenFillUps) : 0;
-        const maxDistanceBetweenFillUps = distancesBetweenFillUps.length ?
-            ss.max(distancesBetweenFillUps) : 0;
-        const nextFillUp = averageDistanceBetweenFillUps ?
-            maxOdometerValue + averageDistanceBetweenFillUps : 0;
-        const maxDistanceToFillUp = maxDistanceBetweenFillUps ?
-            maxOdometerValue + maxDistanceBetweenFillUps : 0;
-
-        const averageFuelConsumption = distancePerLiters.length ?
-            ss.mean(distancePerLiters) : 0;
-        const maxFuelConsumption = distancePerLiters.length ?
-            ss.max(distancePerLiters) : 0;
-        const minFuelConsumption = distancePerLiters.length ?
-            ss.min(distancePerLiters) : 0;
-
-        const stats = {
-            averageDistanceBetweenFillUps: averageDistanceBetweenFillUps.toFixed(2),
-            maxDistanceBetweenFillUps: maxDistanceBetweenFillUps.toFixed(2),
-            nextFillUp: nextFillUp.toFixed(2),
-            maxDistanceToFillUp: maxDistanceToFillUp.toFixed(2),
-            averageFuelConsumption: averageFuelConsumption.toFixed(2),
-            maxFuelConsumption: maxFuelConsumption.toFixed(2),
-            minFuelConsumption: minFuelConsumption.toFixed(2),
-        };
+        const stats = calculateVehicleStats(vehicle, removeOutliers);
 
         res.send(stats);
     } catch (error) {

@@ -4,7 +4,7 @@ const https = require('https');
 const fs = require('fs');
 const app = require('./app');
 require('./db/mongoose');
-require('./telegram-bot');
+require('./telegram/setup');
 
 const server = https.createServer({
     key: fs.readFileSync(SERVER_KEY),
