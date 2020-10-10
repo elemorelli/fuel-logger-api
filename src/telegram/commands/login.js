@@ -11,17 +11,20 @@ bot.onText(/\/login/, async (message) => {
   const args = parseArguments(message.text);
 
   bot.deleteMessage(chatId, message.message_id);
+
+  const user = await User.findOne({ telegramId: chatId });
+
+  if (user) {
+    return bot.sendMessage(chatId, 'You are already logged in');
+  }
+
   try {
+
     const user = await User.findByCredentials(args[0], args[1]);
 
-    if (!user.telegramId) {
-      user.telegramId = chatId;
-      await user.save();
-      bot.sendMessage(chatId, 'User successfully logged in');
-      
-    } else {
-      bot.sendMessage(chatId, 'You are already logged in');
-    }
+    user.telegramId = chatId;
+    await user.save();
+    bot.sendMessage(chatId, 'User successfully logged in');
 
   } catch (error) {
     bot.sendMessage(chatId, 'Invalid credentials. Usage: /login <user> <password>');

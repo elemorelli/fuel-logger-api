@@ -41,6 +41,10 @@ const schema = new mongoose.Schema({
     telegramId: {
         type: Number,
     },
+    selectedVehicle: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Vehicle'
+    },
     avatar: {
         type: Buffer
     },

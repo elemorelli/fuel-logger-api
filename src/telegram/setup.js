@@ -6,3 +6,5 @@ require('./commands/start');
 
 require('./commands/vehicles');
 require('./commands/vehicle_ID');
+
+require('./commands/fill-up');
