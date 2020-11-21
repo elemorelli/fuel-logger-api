@@ -1,11 +1,11 @@
-const { DEVELOPMENT_MODE } = require("../environment");
+const { DEVELOPMENT_MODE, CORS_ALLOWED_DOMAIN } = require("../environment");
 const logger = require("pino")();
 
 const corsMiddleware = (req, res, next) => {
-  logger.info("Inside Cors Middleware!");
-  logger.info({ DEVELOPMENT_MODE });
-
-  if (DEVELOPMENT_MODE === "true") {
+  if (CORS_ALLOWED_DOMAIN) {
+    res.header("Access-Control-Allow-Origin", CORS_ALLOWED_DOMAIN);
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  } else if (DEVELOPMENT_MODE === "true") {
     res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
   }
