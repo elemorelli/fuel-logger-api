@@ -80,7 +80,7 @@ schema.statics.findByCredentials = async (email, password) => {
 
 schema.methods.generateAuthToken = async function () {
   const user = this;
-  const token = jwt.sign({ _id: user._id.toString() }, JWT_SECRET, { expiresIn: "300d" }); // TODO: Reduce expiration and allow to refresh the token
+  const token = jwt.sign({ _id: user._id.toString() }, JWT_SECRET, { expiresIn: "1d" });
   user.tokens = user.tokens.concat({ token });
   await user.save();
   return token;

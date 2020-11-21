@@ -24,7 +24,7 @@ router.post("/users/login", async (req, res) => {
     await user.save();
     res.send({ user, token });
   } catch (error) {
-    res.status(404).send(error);
+    res.status(404).send(error.message);
   }
 });
 
