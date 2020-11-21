@@ -10,9 +10,12 @@ const vehicleRouter = require("./routers/vehicle");
 const fillUpRouter = require("./routers/fill-up");
 const statsRouter = require("./routers/stats");
 
+const corsMiddleware = require("./middleware/cors");
+
 const app = express();
 
 app.use(pino);
+app.use(corsMiddleware);
 
 app.use(express.json());
 app.use(userRouter);
