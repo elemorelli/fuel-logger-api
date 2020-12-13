@@ -10,7 +10,7 @@ router.get("/vehicles/:vehicle_id/stats", auth, async (req, res) => {
   try {
     const vehicle = await Vehicle.findOne({
       _id: req.params.vehicle_id,
-      owner: req.user._id,
+      owner: res.locals.user._id,
     }).populate({
       path: "fillUps",
       options: {

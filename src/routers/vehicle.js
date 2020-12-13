@@ -10,7 +10,7 @@ const router = new express.Router();
 async function getVehicleById(req, res, auth = true) {
   const filter = auth ? {
         _id: req.params.vehicle_id,
-        owner: req.user._id,
+        owner: res.locals.user._id,
       } : {
         _id: req.params.vehicle_id,
       };
@@ -24,7 +24,7 @@ async function getVehicleById(req, res, auth = true) {
 router.post("/vehicles", auth, async (req, res) => {
   const vehicle = new Vehicle({
     ...req.body,
-    owner: req.user._id,
+    owner: res.locals.user._id,
   });
 
   try {
@@ -47,7 +47,7 @@ router.get("/vehicles", auth, async (req, res) => {
     const vehicles = await Vehicle.find(
       {
         ...matcher,
-        owner: req.user._id,
+        owner: res.locals.user._id,
       },
       null,
       {

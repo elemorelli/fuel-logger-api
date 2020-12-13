@@ -31,8 +31,8 @@ router.post("/users/login", async (req, res) => {
 
 router.post("/users/logout", auth, async (req, res) => {
   try {
-    req.user.tokens = req.user.tokens.filter((token) => token.token !== req.token);
-    await req.user.save();
+    res.locals.user.tokens = res.locals.user.tokens.filter((token) => token.token !== res.locals.token);
+    await res.locals.user.save();
     res.end();
   } catch (error) {
     res.status(500).send(error);
@@ -41,8 +41,8 @@ router.post("/users/logout", auth, async (req, res) => {
 
 router.post("/users/logout/all", auth, async (req, res) => {
   try {
-    req.user.tokens = [];
-    await req.user.save();
+    res.locals.user.tokens = [];
+    await res.locals.user.save();
     res.end();
   } catch (error) {
     res.status(500).send(error);
@@ -50,7 +50,7 @@ router.post("/users/logout/all", auth, async (req, res) => {
 });
 
 router.get("/users/me", auth, async (req, res) => {
-  res.send(req.user);
+  res.send(res.locals.user);
 });
 
 router.patch("/users/me", auth, async (req, res) => {
@@ -62,9 +62,9 @@ router.patch("/users/me", auth, async (req, res) => {
     return res.status(400).send({ error: "Invalid fields" });
   }
   try {
-    updates.forEach((field) => (req.user[field] = req.body[field]));
-    await req.user.save();
-    res.send(req.user);
+    updates.forEach((field) => (res.locals.user[field] = req.body[field]));
+    await res.locals.user.save();
+    res.send(res.locals.user);
   } catch (error) {
     res.status(400).send(error);
   }
@@ -72,7 +72,7 @@ router.patch("/users/me", auth, async (req, res) => {
 
 router.delete("/users/me", auth, async (req, res) => {
   try {
-    await req.user.remove();
+    await res.locals.user.remove();
     res.end();
   } catch (error) {
     res.status(500).send(error);
@@ -89,8 +89,8 @@ router.post("/users/me/avatar", auth, upload.single("avatar"), async (req, res) 
       .webp()
       .toBuffer();
 
-    req.user.avatar = buffer;
-    await req.user.save();
+    res.locals.user.avatar = buffer;
+    await res.locals.user.save();
     res.end();
   } catch (error) {
     res.status(400).send(error);
@@ -98,7 +98,7 @@ router.post("/users/me/avatar", auth, upload.single("avatar"), async (req, res) 
 });
 
 router.get("/users/me/avatar", auth, async (req, res, next) => {
-  if (!req.user || !req.user.avatar) {
+  if (!res.locals.user || !res.locals.user.avatar) {
     res.status(404).end();
   } else {
     res.locals.image = user.avatar
@@ -122,8 +122,8 @@ router.get("/users/:id/avatar", async (req, res, next) => {
 }, imageFormatter);
 
 router.delete("/users/me/avatar", auth, async (req, res) => {
-  req.user.avatar = undefined;
-  await req.user.save();
+  res.locals.user.avatar = undefined;
+  await res.locals.user.save();
   res.end();
 });
 

@@ -10,7 +10,7 @@ router.post("/vehicles/:vehicle_id/fill-ups", auth, async (req, res) => {
     // TODO: Validate last date and last odometer value
     const vehicle = await Vehicle.findOne({
       _id: req.params.vehicle_id,
-      owner: req.user._id,
+      owner: res.locals.user._id,
     });
     if (!vehicle) {
       res.status(404).end();
@@ -34,7 +34,7 @@ router.put("/vehicles/:vehicle_id/fill-ups", auth, async (req, res) => {
     // TODO: Validate last date and last odometer value
     const vehicle = await Vehicle.findOne({
       _id: req.params.vehicle_id,
-      owner: req.user._id,
+      owner: res.locals.user._id,
     });
     if (!vehicle) {
       res.status(404).end();
@@ -59,7 +59,7 @@ router.get("/vehicles/:vehicle_id/fill-ups", auth, async (req, res) => {
   try {
     const vehicle = await Vehicle.findOne({
       _id: req.params.vehicle_id,
-      owner: req.user._id,
+      owner: res.locals.user._id,
     }).populate("fillUps");
     if (!vehicle) {
       res.status(404).end();
@@ -75,7 +75,7 @@ router.get("/vehicles/:vehicle_id/fill-ups/:fillup_id", auth, async (req, res) =
   try {
     const vehicle = await Vehicle.findOne({
       _id: req.params.vehicle_id,
-      owner: req.user._id,
+      owner: res.locals.user._id,
     }).populate({
       path: "fillUps",
       match: { _id: { $eq: req.params.fillup_id } },
@@ -103,7 +103,7 @@ router.patch("/vehicles/:vehicle_id/fill-ups/:fillup_id", auth, async (req, res)
 
     const vehicle = await Vehicle.findOne({
       _id: req.params.vehicle_id,
-      owner: req.user._id,
+      owner: res.locals.user._id,
     }).populate({
       path: "fillUps",
       match: { _id: { $eq: req.params.fillup_id } },
@@ -127,7 +127,7 @@ router.delete("/vehicles/:vehicle_id/fill-ups/:fillup_id", auth, async (req, res
     // TODO: Replace with easier way to validate user -> vehicule
     const vehicle = await Vehicle.findOne({
       _id: req.params.vehicle_id,
-      owner: req.user._id,
+      owner: res.locals.user._id,
     });
     if (!vehicle) {
       res.status(404).end();
