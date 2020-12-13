@@ -1,5 +1,4 @@
 const { DEVELOPMENT_MODE, CORS_ALLOWED_DOMAIN } = require("../environment");
-const logger = require("pino")();
 
 const corsMiddleware = (req, res, next) => {
   if (CORS_ALLOWED_DOMAIN) {

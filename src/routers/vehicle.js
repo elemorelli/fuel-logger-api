@@ -3,14 +3,17 @@ const sharp = require("sharp");
 const Vehicle = require("../models/vehicle");
 const auth = require("../middleware/auth");
 const upload = require("../middleware/upload");
+const imageFormatter = require("../middleware/image-formatter");
 
 const router = new express.Router();
 
-async function getVehicleById(req, res) {
-  const filter = {
-    _id: req.params.vehicle_id,
-    owner: req.user._id,
-  };
+async function getVehicleById(req, res, auth = true) {
+  const filter = auth ? {
+        _id: req.params.vehicle_id,
+        owner: req.user._id,
+      } : {
+        _id: req.params.vehicle_id,
+      };
   const vehicle = await Vehicle.findOne(filter);
   if (!vehicle) {
     res.status(404).send();
@@ -105,7 +108,7 @@ router.post("/vehicles/:vehicle_id/picture", auth, upload.single("picture"), asy
         width: 250,
         height: 250,
       })
-      .png()
+      .webp()
       .toBuffer();
 
     vehicle.picture = buffer;
@@ -116,20 +119,20 @@ router.post("/vehicles/:vehicle_id/picture", auth, upload.single("picture"), asy
   }
 });
 
-router.get("/vehicles/:vehicle_id/picture", auth, async (req, res) => {
+router.get("/vehicles/:vehicle_id/picture", async (req, res, next) => {
   try {
-    const vehicle = await getVehicleById(req, res);
+    const vehicle = await getVehicleById(req, res, false);
 
     if (!vehicle.picture) {
       res.status(404).send();
     } else {
-      res.set("Content-Type", "image/png");
-      res.send(vehicle.picture);
+      res.locals.image = vehicle.picture;
+      next();
     }
   } catch (error) {
     res.status(400).send();
   }
-});
+}, imageFormatter);
 
 router.delete("/vehicles/:vehicle_id/picture", auth, async (req, res) => {
   const vehicle = await getVehicleById(req, res);

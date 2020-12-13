@@ -3,6 +3,7 @@ const sharp = require("sharp");
 const User = require("../models/user");
 const auth = require("../middleware/auth");
 const upload = require("../middleware/upload");
+const imageFormatter = require("../middleware/image-formatter");
 
 const router = new express.Router();
 
@@ -85,7 +86,7 @@ router.post("/users/me/avatar", auth, upload.single("avatar"), async (req, res) 
         width: 250,
         height: 250,
       })
-      .png()
+      .webp()
       .toBuffer();
 
     req.user.avatar = buffer;
@@ -96,29 +97,29 @@ router.post("/users/me/avatar", auth, upload.single("avatar"), async (req, res) 
   }
 });
 
-router.get("/users/me/avatar", auth, async (req, res) => {
+router.get("/users/me/avatar", auth, async (req, res, next) => {
   if (!req.user || !req.user.avatar) {
     res.status(404).send();
   } else {
-    res.set("Content-Type", "image/png");
-    res.send(req.user.avatar);
+    res.locals.image = user.avatar
+    next();
   }
-});
+}, imageFormatter);
 
-router.get("/users/:id/avatar", async (req, res) => {
+router.get("/users/:id/avatar", async (req, res, next) => {
   try {
     const user = await User.findById(req.params.id);
 
     if (!user || !user.avatar) {
       throw new Error();
     } else {
-      res.set("Content-Type", "image/png");
-      res.send(user.avatar);
+      res.locals.image = user.avatar
+      next();
     }
   } catch (error) {
     res.status(404).send();
   }
-});
+}, imageFormatter);
 
 router.delete("/users/me/avatar", auth, async (req, res) => {
   req.user.avatar = undefined;
