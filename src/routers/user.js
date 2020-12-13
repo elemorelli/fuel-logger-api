@@ -33,7 +33,7 @@ router.post("/users/logout", auth, async (req, res) => {
   try {
     req.user.tokens = req.user.tokens.filter((token) => token.token !== req.token);
     await req.user.save();
-    res.send();
+    res.end();
   } catch (error) {
     res.status(500).send(error);
   }
@@ -43,7 +43,7 @@ router.post("/users/logout/all", auth, async (req, res) => {
   try {
     req.user.tokens = [];
     await req.user.save();
-    res.send();
+    res.end();
   } catch (error) {
     res.status(500).send(error);
   }
@@ -73,7 +73,7 @@ router.patch("/users/me", auth, async (req, res) => {
 router.delete("/users/me", auth, async (req, res) => {
   try {
     await req.user.remove();
-    res.send();
+    res.end();
   } catch (error) {
     res.status(500).send(error);
   }
@@ -91,7 +91,7 @@ router.post("/users/me/avatar", auth, upload.single("avatar"), async (req, res) 
 
     req.user.avatar = buffer;
     await req.user.save();
-    res.send();
+    res.end();
   } catch (error) {
     res.status(400).send(error);
   }
@@ -99,7 +99,7 @@ router.post("/users/me/avatar", auth, upload.single("avatar"), async (req, res) 
 
 router.get("/users/me/avatar", auth, async (req, res, next) => {
   if (!req.user || !req.user.avatar) {
-    res.status(404).send();
+    res.status(404).end();
   } else {
     res.locals.image = user.avatar
     next();
@@ -117,14 +117,14 @@ router.get("/users/:id/avatar", async (req, res, next) => {
       next();
     }
   } catch (error) {
-    res.status(404).send();
+    res.status(404).end();
   }
 }, imageFormatter);
 
 router.delete("/users/me/avatar", auth, async (req, res) => {
   req.user.avatar = undefined;
   await req.user.save();
-  res.send();
+  res.end();
 });
 
 module.exports = router;

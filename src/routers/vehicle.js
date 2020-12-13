@@ -16,7 +16,7 @@ async function getVehicleById(req, res, auth = true) {
       };
   const vehicle = await Vehicle.findOne(filter);
   if (!vehicle) {
-    res.status(404).send();
+    res.status(404).end();
   }
   return vehicle;
 }
@@ -66,7 +66,7 @@ router.get("/vehicles/:vehicle_id", auth, async (req, res) => {
     const vehicle = await getVehicleById(req, res);
     res.send(vehicle);
   } catch (error) {
-    res.status(500).send();
+    res.status(500).end();
   }
 });
 
@@ -85,7 +85,7 @@ router.patch("/vehicles/:vehicle_id", auth, async (req, res) => {
     await vehicle.save();
     res.send(vehicle);
   } catch (error) {
-    res.status(500).send();
+    res.status(500).end();
   }
 });
 
@@ -93,7 +93,7 @@ router.delete("/vehicles/:vehicle_id", auth, async (req, res) => {
   try {
     const vehicle = await getVehicleById(req, res);
     vehicle.remove();
-    res.send();
+    res.end();
   } catch (error) {
     res.status(500).send(error);
   }
@@ -113,7 +113,7 @@ router.post("/vehicles/:vehicle_id/picture", auth, upload.single("picture"), asy
 
     vehicle.picture = buffer;
     await vehicle.save();
-    res.send();
+    res.end();
   } catch (error) {
     res.status(500).send(error);
   }
@@ -124,13 +124,13 @@ router.get("/vehicles/:vehicle_id/picture", async (req, res, next) => {
     const vehicle = await getVehicleById(req, res, false);
 
     if (!vehicle.picture) {
-      res.status(404).send();
+      res.status(404).end();
     } else {
       res.locals.image = vehicle.picture;
       next();
     }
   } catch (error) {
-    res.status(400).send();
+    res.status(400).end();
   }
 }, imageFormatter);
 
@@ -138,7 +138,7 @@ router.delete("/vehicles/:vehicle_id/picture", auth, async (req, res) => {
   const vehicle = await getVehicleById(req, res);
   vehicle.picture = undefined;
   await vehicle.save();
-  res.send();
+  res.end();
 });
 
 module.exports = router;

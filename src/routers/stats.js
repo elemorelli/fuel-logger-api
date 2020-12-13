@@ -18,7 +18,7 @@ router.get("/vehicles/:vehicle_id/stats", auth, async (req, res) => {
       },
     });
     if (!vehicle) {
-      res.status(404).send();
+      res.status(404).end();
     }
     const removeOutliers = Boolean(req.query.removeOutliers);
 
@@ -26,7 +26,7 @@ router.get("/vehicles/:vehicle_id/stats", auth, async (req, res) => {
 
     res.send(stats);
   } catch (error) {
-    res.status(500).send();
+    res.status(500).end();
   }
 });
 

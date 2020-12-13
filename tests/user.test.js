@@ -88,22 +88,22 @@ test("Should not login user with bad password", async () => {
 });
 
 test("Should get profile for user", async () => {
-  await request(app).get("/users/me").set("Authorization", `Bearer ${userOneToken}`).send().expect(200);
+  await request(app).get("/users/me").set("Authorization", `Bearer ${userOneToken}`).end().expect(200);
 });
 
 test("Should not get profile for unauthenticated user", async () => {
-  await request(app).get("/users/me").send().expect(401);
+  await request(app).get("/users/me").end().expect(401);
 });
 
 test("Should delete account for user", async () => {
-  await request(app).delete("/users/me").set("Authorization", `Bearer ${userOneToken}`).send().expect(200);
+  await request(app).delete("/users/me").set("Authorization", `Bearer ${userOneToken}`).end().expect(200);
 
   const user = await User.findById(userOneId);
   expect(user).toBeNull();
 });
 
 test("Should not delete account for unauthenticated user", async () => {
-  await request(app).delete("/users/me").send().expect(401);
+  await request(app).delete("/users/me").end().expect(401);
 });
 
 test("Should upload avatar", async () => {

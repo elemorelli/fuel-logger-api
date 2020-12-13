@@ -13,7 +13,7 @@ router.post("/vehicles/:vehicle_id/fill-ups", auth, async (req, res) => {
       owner: req.user._id,
     });
     if (!vehicle) {
-      res.status(404).send();
+      res.status(404).end();
     }
 
     const fillUp = new FillUp({
@@ -37,7 +37,7 @@ router.put("/vehicles/:vehicle_id/fill-ups", auth, async (req, res) => {
       owner: req.user._id,
     });
     if (!vehicle) {
-      res.status(404).send();
+      res.status(404).end();
     }
 
     for (const item of req.body) {
@@ -62,12 +62,12 @@ router.get("/vehicles/:vehicle_id/fill-ups", auth, async (req, res) => {
       owner: req.user._id,
     }).populate("fillUps");
     if (!vehicle) {
-      res.status(404).send();
+      res.status(404).end();
     }
 
     res.send(vehicle.fillUps);
   } catch (error) {
-    res.status(400).send();
+    res.status(400).end();
   }
 });
 
@@ -81,12 +81,12 @@ router.get("/vehicles/:vehicle_id/fill-ups/:fillup_id", auth, async (req, res) =
       match: { _id: { $eq: req.params.fillup_id } },
     });
     if (!vehicle || !vehicle.fillUps || !vehicle.fillUps.length) {
-      res.status(404).send();
+      res.status(404).end();
     }
 
     res.send(vehicle.fillUps[0]);
   } catch (error) {
-    res.status(400).send();
+    res.status(400).end();
   }
 });
 
@@ -109,7 +109,7 @@ router.patch("/vehicles/:vehicle_id/fill-ups/:fillup_id", auth, async (req, res)
       match: { _id: { $eq: req.params.fillup_id } },
     });
     if (!vehicle || !vehicle.fillUps || !vehicle.fillUps.length) {
-      res.status(404).send();
+      res.status(404).end();
     }
 
     const fillUp = vehicle.fillUps[0];
@@ -118,7 +118,7 @@ router.patch("/vehicles/:vehicle_id/fill-ups/:fillup_id", auth, async (req, res)
     await fillUp.save();
     res.send(fillUp);
   } catch (error) {
-    res.status(500).send();
+    res.status(500).end();
   }
 });
 
@@ -130,16 +130,16 @@ router.delete("/vehicles/:vehicle_id/fill-ups/:fillup_id", auth, async (req, res
       owner: req.user._id,
     });
     if (!vehicle) {
-      res.status(404).send();
+      res.status(404).end();
     }
     const fillUp = await FillUp.findOneAndDelete({
       _id: req.params.fillup_id,
       owner: req.params.vehicle_id,
     });
     if (!fillUp) {
-      return res.status(404).send();
+      return res.status(404).end();
     }
-    res.send();
+    res.end();
   } catch (error) {
     res.status(500).send(error);
   }
